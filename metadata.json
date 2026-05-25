@@ -1,0 +1,6 @@
+{
+  "name": "GeoGuessr Google Maps",
+  "description": "GeoGuessr benzeri Türkiye ve Dünya haritası tahmin oyunu. Google Maps JS API ile rastgele yerleri keşfedin, tahmin edin ve puan toplayın.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
