@@ -583,6 +583,20 @@ export default function App() {
                   </div>
                   <div className="h-4 w-px bg-slate-700/50" />
                   
+                  {gameStatus === 'playing' && gameMode === 'unlimited' && (
+                    <>
+                      <button 
+                        onClick={handleFinishUnlimitedGame}
+                        className="bg-red-500/10 hover:bg-red-500/30 border border-red-500/30 hover:border-red-500/60 text-red-400 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all duration-300 cursor-pointer shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_20px_rgba(239,68,68,0.3)] hover:scale-105"
+                        title="Oyunu bitir ve skoru kaydet"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span className="font-bold tracking-wide">Serüveni Bitir</span>
+                      </button>
+                      <div className="h-4 w-px bg-slate-700/50" />
+                    </>
+                  )}
+                  
                   {gameStatus === 'playing' && gameMode !== 'unlimited' && (
                     <>
                       <div className="text-slate-450 flex items-center gap-1.5 font-mono">
@@ -1375,6 +1389,16 @@ export default function App() {
                               </span>
                               <ArrowRight className="w-4 h-4 text-white" />
                             </button>
+                            
+                            {gameMode === 'unlimited' && (
+                              <button
+                                onClick={handleFinishUnlimitedGame}
+                                className="w-full py-2.5 bg-red-950/40 hover:bg-red-600/80 border border-red-500/20 hover:border-red-400 text-red-400 hover:text-white rounded-xl text-[10px] font-black font-display tracking-wider transition duration-150 flex items-center justify-center gap-2 cursor-pointer"
+                              >
+                                <LogOut className="w-3.5 h-3.5" />
+                                <span>SERÜVENİ BİTİR VE SKORU KAYDET</span>
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
