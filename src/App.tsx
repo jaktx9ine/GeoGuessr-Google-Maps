@@ -158,6 +158,7 @@ export default function App() {
 
   // Active Tab/Modal helpers
   const [activeMenuTab, setActiveMenuTab] = useState<'play' | 'leaderboard' | 'api-info'>('play');
+  const [showFinishConfirm, setShowFinishConfirm] = useState<boolean>(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [isMapExpanded, setIsMapExpanded] = useState(false);
   const [isMapHovered, setIsMapHovered] = useState(false);
@@ -401,6 +402,7 @@ export default function App() {
       setGameStatus('playing');
       setMobileActiveView('pano');
       setIsMapExpanded(false);
+      setShowFinishConfirm(false);
     } else {
       // Game Over: Save leaderboard score
       handleFinishUnlimitedGame();
@@ -1390,14 +1392,34 @@ export default function App() {
                               <ArrowRight className="w-4 h-4 text-white" />
                             </button>
                             
-                            {gameMode === 'unlimited' && (
+                            {gameMode === 'unlimited' && !showFinishConfirm && (
                               <button
-                                onClick={handleFinishUnlimitedGame}
+                                onClick={() => setShowFinishConfirm(true)}
                                 className="w-full py-2.5 bg-red-950/40 hover:bg-red-600/80 border border-red-500/20 hover:border-red-400 text-red-400 hover:text-white rounded-xl text-[10px] font-black font-display tracking-wider transition duration-150 flex items-center justify-center gap-2 cursor-pointer"
                               >
                                 <LogOut className="w-3.5 h-3.5" />
                                 <span>SERÜVENİ BİTİR VE SKORU KAYDET</span>
                               </button>
+                            )}
+                            
+                            {gameMode === 'unlimited' && showFinishConfirm && (
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => setShowFinishConfirm(false)}
+                                  className="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-[10px] font-black font-display tracking-wider transition duration-150 cursor-pointer"
+                                >
+                                  İPTAL
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setShowFinishConfirm(false);
+                                    handleFinishUnlimitedGame();
+                                  }}
+                                  className="w-1/2 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-[10px] font-black font-display tracking-wider transition duration-150 cursor-pointer"
+                                >
+                                  EVET, BİTİR
+                                </button>
+                              </div>
                             )}
                           </div>
                         )}
