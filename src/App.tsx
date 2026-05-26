@@ -1392,7 +1392,7 @@ export default function App() {
                               <ArrowRight className="w-4 h-4 text-white" />
                             </button>
                             
-                            {gameMode === 'unlimited' && !showFinishConfirm && (
+                            {gameMode === 'unlimited' && (
                               <button
                                 onClick={() => setShowFinishConfirm(true)}
                                 className="w-full py-2.5 bg-red-950/40 hover:bg-red-600/80 border border-red-500/20 hover:border-red-400 text-red-400 hover:text-white rounded-xl text-[10px] font-black font-display tracking-wider transition duration-150 flex items-center justify-center gap-2 cursor-pointer"
@@ -1400,26 +1400,6 @@ export default function App() {
                                 <LogOut className="w-3.5 h-3.5" />
                                 <span>SERÜVENİ BİTİR VE SKORU KAYDET</span>
                               </button>
-                            )}
-                            
-                            {gameMode === 'unlimited' && showFinishConfirm && (
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => setShowFinishConfirm(false)}
-                                  className="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-[10px] font-black font-display tracking-wider transition duration-150 cursor-pointer"
-                                >
-                                  İPTAL
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setShowFinishConfirm(false);
-                                    handleFinishUnlimitedGame();
-                                  }}
-                                  className="w-1/2 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-[10px] font-black font-display tracking-wider transition duration-150 cursor-pointer"
-                                >
-                                  EVET, BİTİR
-                                </button>
-                              </div>
                             )}
                           </div>
                         )}
@@ -1643,6 +1623,56 @@ export default function App() {
 
           </AnimatePresence>
         </main>
+
+        {/* FINISH UNLIMITED MODE CONFIRMATION MODAL */}
+        <AnimatePresence>
+          {showFinishConfirm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="bg-slate-900 border border-slate-700/50 rounded-3xl p-8 max-w-sm w-full shadow-[0_0_50px_rgba(239,68,68,0.1)] flex flex-col items-center text-center relative overflow-hidden"
+              >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500/0 via-red-500 to-red-500/0" />
+                
+                <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 mb-6 shadow-inner">
+                  <ShieldAlert className="w-8 h-8" />
+                </div>
+                
+                <h3 className="text-xl font-bold text-white mb-2 font-display tracking-tight">Serüveni Bitir</h3>
+                <p className="text-sm text-slate-400 mb-8 leading-relaxed">
+                  Sınırsız modu sonlandırmak ve şu ana kadar topladığınız puanı <strong className="text-emerald-400 font-mono">{totalScore}</strong> kaydetmek istediğinize emin misiniz?
+                </p>
+                
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={() => setShowFinishConfirm(false)}
+                    className="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    İPTAL ET
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowFinishConfirm(false);
+                      handleFinishUnlimitedGame();
+                    }}
+                    className="flex-1 py-3.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg hover:shadow-red-500/25 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    BİTİR
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* MODAL FOR DEVELOPMENT SETTINGS, CREDITS & INFO */}
         <AnimatePresence>
