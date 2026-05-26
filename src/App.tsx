@@ -1247,7 +1247,7 @@ export default function App() {
                             className="w-full py-3.5 bg-red-600 hover:bg-red-500 hover:shadow-lg hover:shadow-red-650/20 text-white font-black rounded-xl text-xs font-display tracking-widest transition duration-150 inline-flex items-center justify-center gap-2 cursor-pointer shadow-md mt-4"
                           >
                             <span>
-                              {currentRoundIndex + 1 >= 5 ? 'OYUNU BİTİR' : 'SIRADAKİ LOKASYONA GEÇ'}
+                              {currentRoundIndex + 1 >= 5 && gameMode !== 'unlimited' ? 'OYUNU BİTİR' : 'SIRADAKİ LOKASYONA GEÇ'}
                             </span>
                             <ArrowRight className="w-4 h-4 text-white" />
                           </button>
@@ -1360,7 +1360,7 @@ export default function App() {
                               className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black font-display tracking-wider transition duration-150 flex items-center justify-center gap-2 cursor-pointer shadow-xl shadow-blue-600/10 hover:scale-[1.01]"
                             >
                               <span>
-                                {currentRoundIndex + 1 >= 5 ? 'OYUNU BİTİR' : 'SONRAKİ TUR'}
+                                {currentRoundIndex + 1 >= 5 && gameMode !== 'unlimited' ? 'OYUNU BİTİR' : 'SONRAKİ TUR'}
                               </span>
                               <ArrowRight className="w-4 h-4 text-white" />
                             </button>
