@@ -153,12 +153,15 @@ export default function InteractiveStreetView({
     };
 
     // Stage 1: Tight matching (100 meters) to match landmarks and precise neighborhoods without snapping to distant highways.
-    // Force OUTDOOR sources to guarantee navigable streets and paths where users can walk around.
+    // Force GOOGLE sources to guarantee official, navigable streets and paths.
+    // We use type casting to avoid TS errors in case the local @types/google.maps is outdated.
+    const googleSource = (google.maps.StreetViewSource as any).GOOGLE || google.maps.StreetViewSource.OUTDOOR;
+
     service.getPanorama(
       {
         location: position,
         radius: 100,
-        sources: [google.maps.StreetViewSource.OUTDOOR],
+        sources: [googleSource],
         preference: google.maps.StreetViewPreference.BEST,
       },
       (data, statusResult) => {
@@ -171,7 +174,7 @@ export default function InteractiveStreetView({
             {
               location: position,
               radius: 1000,
-              sources: [google.maps.StreetViewSource.OUTDOOR],
+              sources: [googleSource],
               preference: google.maps.StreetViewPreference.BEST,
             },
             (dataFallback, statusFallbackResult) => {
@@ -183,6 +186,7 @@ export default function InteractiveStreetView({
                   {
                     location: position,
                     radius: 50000,
+                    sources: [googleSource], // Force Google even on extreme radius
                     preference: google.maps.StreetViewPreference.BEST,
                   },
                   (dataThird, statusThirdResult) => {
