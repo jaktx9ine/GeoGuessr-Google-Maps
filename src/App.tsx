@@ -1304,8 +1304,8 @@ export default function App() {
                     onMouseEnter={handleMouseEnterMap}
                     onMouseLeave={handleMouseLeaveMap}
                     className={`transition-all duration-300 ease-in-out bg-slate-950 ${
-                      mobileActiveView === 'map' ? 'block w-full h-full z-30' : 'hidden lg:block absolute bottom-8 right-8 z-30 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-700/60 overflow-hidden'
-                    } ${!isMapExpanded && mobileActiveView !== 'map' ? 'w-[320px] h-[320px] rounded-[48px] opacity-70 hover:opacity-100 hover:scale-[1.03] hover:rounded-3xl hover:border-slate-500' : ''} ${isMapExpanded && mobileActiveView !== 'map' ? 'w-[600px] h-[600px] rounded-3xl opacity-100' : ''}`}
+                      mobileActiveView === 'map' ? 'block w-full h-full z-30' : 'hidden lg:block absolute bottom-8 right-8 z-30 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-700/60 overflow-hidden w-[400px] h-[400px] rounded-[48px] opacity-40 hover:opacity-100 hover:w-[600px] hover:h-[600px] hover:rounded-3xl hover:border-slate-500'
+                    }`}
                   >
                     <div className="w-full h-full relative flex flex-col justify-between">
                       
@@ -1336,12 +1336,7 @@ export default function App() {
                             </span>
                           )}
 
-                          <button
-                            onClick={() => setIsMapExpanded(!isMapExpanded)}
-                            className="hidden lg:block px-2.5 py-1 rounded-lg bg-slate-850 hover:bg-slate-800 text-[10px] text-slate-400 hover:text-white transition cursor-pointer font-mono border border-slate-700/30"
-                          >
-                            {isMapExpanded ? 'Haritayı Küçült ⤋' : 'Haritayı Genişlet ⤢'}
-                          </button>
+
                         </div>
 
                         {/* CTA ACTION BUTTON */}
