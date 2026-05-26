@@ -1079,7 +1079,7 @@ export default function App() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="space-y-4"
+                className="w-full h-full"
               >
                 {/* DYNAMIC GOOGLE MAPS AUTH FAILURE SOLVER PANEL */}
                 {googleMapsAuthError && (
@@ -1272,8 +1272,8 @@ export default function App() {
                     />
 
                     {/* LARGE BEAUTIFUL FLOATING COUNTDOWN TIMER OVERLAY */}
-                    {gameStatus === 'playing' && (
-                      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none select-none">
+                    {gameStatus === 'playing' && gameMode !== 'unlimited' && (
+                      <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20 pointer-events-none select-none">
                         <div className={`flex flex-col items-center gap-0.5 px-6 py-2.5 rounded-2xl backdrop-blur-md transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.5)] ${
                           timeLeft <= 10
                             ? 'border border-red-500 bg-red-950/80 text-red-400 animate-[bounce_1s_infinite] scale-110 shadow-red-500/20'
