@@ -27,7 +27,8 @@ import {
   Languages,
   Clock,
   Share2,
-  Check
+  Check,
+  LogOut
 } from 'lucide-react';
 
 import { LocationData, Guess, LeaderboardEntry } from './types';
@@ -40,6 +41,7 @@ import GuessingMap from './components/GuessingMap';
 import ApiInfo from './components/ApiInfo';
 import StatsDashboard from './components/StatsDashboard';
 import { AnimatedCounter } from './components/AnimatedCounter';
+import MouseParticles from './components/MouseParticles';
 
 // Custom environment api key lookup
 const API_KEY =
@@ -377,6 +379,18 @@ export default function App() {
   }, [gameStatus, currentRoundIndex, gameMode]);
 
   // 3. Results Phase: Go to next round or finish
+  const handleFinishUnlimitedGame = () => {
+    const finalScore = totalScore;
+    const entry: LeaderboardEntry = {
+      name: username,
+      score: finalScore,
+      date: new Date().toISOString(),
+      mode: gameMode,
+    };
+    saveLeaderboardEntry(entry);
+    setGameStatus('finished');
+  };
+
   const handleNextRound = () => {
     const nextIndex = currentRoundIndex + 1;
     if ((gameMode === 'unlimited' || nextIndex < 5) && nextIndex < gameRoundsList.length) {
@@ -389,15 +403,7 @@ export default function App() {
       setIsMapExpanded(false);
     } else {
       // Game Over: Save leaderboard score
-      const finalScore = totalScore;
-      const entry: LeaderboardEntry = {
-        name: username,
-        score: finalScore,
-        date: new Date().toISOString(),
-        mode: gameMode,
-      };
-      saveLeaderboardEntry(entry);
-      setGameStatus('finished');
+      handleFinishUnlimitedGame();
     }
   };
 
@@ -515,7 +521,8 @@ export default function App() {
 
   return (
     <APIProvider apiKey={API_KEY} version="weekly">
-      <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-blue-500/20 selection:text-blue-300 relative">
+      {gameStatus !== 'playing' && gameStatus !== 'guessed' && <MouseParticles />}
+      <div className={`relative min-h-screen text-white font-sans overflow-x-hidden ${gameStatus === 'playing' ? 'bg-slate-950' : 'bg-slate-950'}`}>
         
         {/* Sleek Ambient Vignette */}
         <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_150px_rgba(0,0,0,0.7)] z-[5]" />
@@ -751,27 +758,28 @@ export default function App() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       {/* MODE 1: TÜRKİYE */}
                       <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-750 transition-all duration-300 rounded-2xl p-6 flex flex-col justify-between h-72 shadow-xl group cursor-pointer"
+                        whileHover={{ scale: 1.02, y: -5 }}
+                        className="relative overflow-hidden bg-slate-900/40 backdrop-blur-xl border border-slate-700/50 hover:border-rose-500/50 hover:bg-slate-900/60 transition-all duration-500 rounded-3xl p-7 flex flex-col justify-between h-80 shadow-[0_8px_32px_rgba(0,0,0,0.37)] hover:shadow-[0_0_40px_rgba(244,63,94,0.15)] group cursor-pointer"
                         onClick={() => handleStartGame('turkey')}
                       >
-                        <div className="space-y-4">
-                          <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shadow-inner group-hover:bg-rose-500/25 transition">
-                            <Map className="w-6 h-6" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="relative space-y-4 z-10">
+                          <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shadow-inner group-hover:bg-rose-500/20 group-hover:scale-110 transition-all duration-500">
+                            <Map className="w-7 h-7 drop-shadow-[0_0_10px_rgba(244,63,94,0.5)]" />
                           </div>
                           <div>
-                            <div className="flex items-center gap-1.5">
-                              <h4 className="font-bold text-white text-md">Türkiye Turu</h4>
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded">Kolay-Orta</span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-bold text-white text-lg tracking-tight">Türkiye Turu</h4>
+                              <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full">Kolay-Orta</span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                              Kapadokya, Efes Antik Kenti ve Sümela Manastırı gibi Türkiye'nin en nadide tarihi miraslarını ve doğal harikalarını tahmin edin.
+                            <p className="text-xs text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">
+                              Kapadokya, Efes Antik Kenti ve Sümela Manastırı gibi Türkiye'nin en nadide tarihi miraslarını tahmin edin.
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={(e) => { e.stopPropagation(); handleStartGame('turkey'); }}
-                          className="w-full py-2.5 bg-slate-800 hover:bg-rose-600 hover:text-white text-xs font-bold text-slate-300 rounded-xl transition cursor-pointer font-display"
+                          className="relative z-10 w-full py-3 bg-slate-800/80 hover:bg-rose-600 text-slate-300 hover:text-white text-xs font-black rounded-xl transition-all duration-300 cursor-pointer font-display tracking-wider border border-slate-700/50 hover:border-rose-500 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.3)]"
                         >
                           Yolculuğa Başla
                         </button>
@@ -779,27 +787,28 @@ export default function App() {
 
                       {/* MODE 2: DÜNYA LİMİTLERİ (LANDMARKS) */}
                       <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-750 transition-all duration-300 rounded-2xl p-6 flex flex-col justify-between h-72 shadow-xl group cursor-pointer"
+                        whileHover={{ scale: 1.02, y: -5 }}
+                        className="relative overflow-hidden bg-slate-900/40 backdrop-blur-xl border border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-900/60 transition-all duration-500 rounded-3xl p-7 flex flex-col justify-between h-80 shadow-[0_8px_32px_rgba(0,0,0,0.37)] hover:shadow-[0_0_40px_rgba(59,130,246,0.15)] group cursor-pointer"
                         onClick={() => handleStartGame('world')}
                       >
-                        <div className="space-y-4">
-                          <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-inner group-hover:bg-blue-500/25 transition">
-                            <Globe className="w-6 h-6" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="relative space-y-4 z-10">
+                          <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-inner group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-500">
+                            <Globe className="w-7 h-7 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
                           </div>
                           <div>
-                            <div className="flex items-center gap-1.5">
-                              <h4 className="font-bold text-white text-md">Dünya (Meşhur Yerler)</h4>
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded">Orta</span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-bold text-white text-lg tracking-tight">Dünya Harikaları</h4>
+                              <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full">Orta</span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                              Eyfel Kulesi, Kolezyum ve Tac Mahal gibi dünya tarihine yön vermiş, küresel ölçekteki görkemli mimari anıtları saptayın.
+                            <p className="text-xs text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">
+                              Eyfel Kulesi, Kolezyum ve Tac Mahal gibi dünya tarihine yön vermiş görkemli anıtları saptayın.
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={(e) => { e.stopPropagation(); handleStartGame('world'); }}
-                          className="w-full py-2.5 bg-slate-800 hover:bg-blue-600 hover:text-white text-xs font-bold text-slate-300 rounded-xl transition cursor-pointer font-display"
+                          className="relative z-10 w-full py-3 bg-slate-800/80 hover:bg-blue-600 text-slate-300 hover:text-white text-xs font-black rounded-xl transition-all duration-300 cursor-pointer font-display tracking-wider border border-slate-700/50 hover:border-blue-500 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
                         >
                           Keşfetmeye Başla
                         </button>
@@ -807,27 +816,28 @@ export default function App() {
 
                       {/* MODE: SINIRSIZ MOD */}
                       <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-750 transition-all duration-300 rounded-2xl p-6 flex flex-col justify-between h-72 shadow-xl group cursor-pointer"
+                        whileHover={{ scale: 1.02, y: -5 }}
+                        className="relative overflow-hidden bg-slate-900/40 backdrop-blur-xl border border-slate-700/50 hover:border-purple-500/50 hover:bg-slate-900/60 transition-all duration-500 rounded-3xl p-7 flex flex-col justify-between h-80 shadow-[0_8px_32px_rgba(0,0,0,0.37)] hover:shadow-[0_0_40px_rgba(168,85,247,0.15)] group cursor-pointer"
                         onClick={() => handleStartGame('unlimited')}
                       >
-                        <div className="space-y-4">
-                          <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shadow-inner group-hover:bg-purple-500/25 transition">
-                            <Compass className="w-6 h-6" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="relative space-y-4 z-10">
+                          <div className="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shadow-inner group-hover:bg-purple-500/20 group-hover:scale-110 transition-all duration-500">
+                            <Compass className="w-7 h-7 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
                           </div>
                           <div>
-                            <div className="flex items-center gap-1.5">
-                              <h4 className="font-bold text-white text-md">Sınırsız Mod</h4>
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded">Zor</span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-bold text-white text-lg tracking-tight">Sınırsız Mod</h4>
+                              <span className="text-[10px] font-bold px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-full">Zor</span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                              Süre yok, tur sınırı yok! Tüm dünyada rastgele konumlarda dilediğiniz kadar gezin.
+                            <p className="text-xs text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">
+                              Süre yok, tur sınırı yok! Tüm dünyada rastgele konumlarda dilediğiniz kadar özgürce gezin.
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={(e) => { e.stopPropagation(); handleStartGame('unlimited'); }}
-                          className="w-full py-2.5 bg-slate-800 hover:bg-purple-600 hover:text-white text-xs font-bold text-slate-300 rounded-xl transition cursor-pointer font-display"
+                          className="relative z-10 w-full py-3 bg-slate-800/80 hover:bg-purple-600 text-slate-300 hover:text-white text-xs font-black rounded-xl transition-all duration-300 cursor-pointer font-display tracking-wider border border-slate-700/50 hover:border-purple-500 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
                         >
                           Sonsuz Keşfe Çık
                         </button>
@@ -835,25 +845,26 @@ export default function App() {
 
                       {/* MODE 3: DÜNYA SOKAKLARI */}
                       <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className="bg-slate-900/70 hover:bg-slate-900 border border-slate-750 hover:border-emerald-500/35 transition-all duration-300 rounded-2xl p-6 flex flex-col justify-between h-72 shadow-xl group relative overflow-hidden cursor-pointer"
+                        whileHover={{ scale: 1.02, y: -5 }}
+                        className="relative overflow-hidden bg-slate-900/40 backdrop-blur-xl border border-slate-700/50 hover:border-emerald-500/50 hover:bg-slate-900/60 transition-all duration-500 rounded-3xl p-7 flex flex-col justify-between h-80 shadow-[0_8px_32px_rgba(0,0,0,0.37)] hover:shadow-[0_0_40px_rgba(16,185,129,0.15)] group cursor-pointer"
                         onClick={() => handleStartGame('world_streets')}
                       >
-                        <div className="absolute top-0 right-0 bg-gradient-to-l from-emerald-500 to-teal-500 text-slate-950 font-black text-[9px] tracking-widest px-3 py-1 rounded-bl-xl uppercase font-mono shadow-md animate-pulse">
+                        <div className="absolute top-0 right-0 bg-gradient-to-l from-emerald-500 to-teal-400 text-slate-950 font-black text-[10px] tracking-widest px-4 py-1.5 rounded-bl-2xl uppercase font-mono shadow-md animate-pulse z-20">
                           YENİ
                         </div>
-
-                        <div className="space-y-4">
-                          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-inner group-hover:bg-emerald-500/25 transition">
-                            <Milestone className="w-6 h-6" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        
+                        <div className="relative space-y-4 z-10">
+                          <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-inner group-hover:bg-emerald-500/20 group-hover:scale-110 transition-all duration-500">
+                            <Milestone className="w-7 h-7 drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                           </div>
                           <div>
-                            <div className="flex items-center gap-1.5">
-                              <h4 className="font-bold text-white text-md">Sokaklar & Mahalleler</h4>
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-500/10 text-amber-400 rounded">Zor</span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-bold text-white text-lg tracking-tight">Sokaklar & Şehirler</h4>
+                              <span className="text-[10px] font-bold px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-full">Zor</span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                              <strong>Serbest Gezinti Modu!</strong> Japonya, Londra, Paris, New York ve dahasının arka sokakları. Tabelaları okuyarak ülkeyi saptayın.
+                            <p className="text-xs text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">
+                              <strong>Serbest Gezinti!</strong> Japonya, Londra, Paris, New York ve dahasının arka sokaklarını deneyimleyin.
                             </p>
                           </div>
                         </div>
