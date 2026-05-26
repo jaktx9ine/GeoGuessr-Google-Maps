@@ -283,7 +283,7 @@ export default function App() {
       finalPool = [...finalPool, ...shuffledExtra.slice(0, 5 - finalPool.length)];
     }
 
-    const chosenRounds = finalPool.slice(0, 5);
+    const chosenRounds = mode === 'unlimited' ? finalPool : finalPool.slice(0, 5);
 
     // Save history
     const updatedPlayed = [...playedLocationIds];
@@ -293,8 +293,8 @@ export default function App() {
       }
     });
 
-    if (updatedPlayed.length > 50) {
-      updatedPlayed.splice(0, updatedPlayed.length - 50);
+    if (updatedPlayed.length > 300) {
+      updatedPlayed.splice(0, updatedPlayed.length - 300);
     }
 
     setPlayedLocationIds(updatedPlayed);
@@ -357,7 +357,7 @@ export default function App() {
 
   // Countdown Timer for each round
   useEffect(() => {
-    if (gameStatus !== 'playing') return;
+    if (gameStatus !== 'playing' || gameMode === 'unlimited') return;
 
     // Reset timer to 150 seconds (2 minutes 30 seconds) whenever round changes or we start playing
     setTimeLeft(150);
@@ -374,12 +374,12 @@ export default function App() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [gameStatus, currentRoundIndex]);
+  }, [gameStatus, currentRoundIndex, gameMode]);
 
   // 3. Results Phase: Go to next round or finish
   const handleNextRound = () => {
     const nextIndex = currentRoundIndex + 1;
-    if (nextIndex < 5 && nextIndex < gameRoundsList.length) {
+    if ((gameMode === 'unlimited' || nextIndex < 5) && nextIndex < gameRoundsList.length) {
       setCurrentRoundIndex(nextIndex);
       setCurrentLocation(gameRoundsList[nextIndex]);
       setSelectedGuessLatLng(null);
@@ -521,7 +521,7 @@ export default function App() {
         <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_150px_rgba(0,0,0,0.7)] z-[5]" />
 
         {/* TOP STATUS BAR & HEADER */}
-        <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-700/50 px-6 py-4 sticky top-0 z-40 shadow-2xl">
+        <header className={`bg-slate-900/80 backdrop-blur-md border-b border-slate-700/50 px-6 py-4 z-50 shadow-2xl ${gameStatus === 'playing' || gameStatus === 'guessed' ? 'fixed top-0 w-full' : 'sticky top-0'}`}>
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <button 
               onClick={handleRestart}
@@ -572,11 +572,11 @@ export default function App() {
               {gameStatus === 'playing' || gameStatus === 'guessed' ? (
                 <div className="hidden md:flex items-center gap-5 bg-slate-900/80 backdrop-blur-md border border-slate-700/50 px-4 py-2 rounded-xl shadow-lg text-xs font-mono">
                   <div className="text-slate-400">
-                    Tur: <span className="text-white font-black">{currentRoundIndex + 1} / 05</span>
+                    Tur: <span className="text-white font-black">{currentRoundIndex + 1} {gameMode !== 'unlimited' ? '/ 05' : ''}</span>
                   </div>
                   <div className="h-4 w-px bg-slate-700/50" />
                   
-                  {gameStatus === 'playing' && (
+                  {gameStatus === 'playing' && gameMode !== 'unlimited' && (
                     <>
                       <div className="text-slate-450 flex items-center gap-1.5 font-mono">
                         <Clock className={`w-4 h-4 ${timeLeft <= 30 ? 'text-red-550 animate-pulse' : 'text-blue-400'}`} />
@@ -608,7 +608,7 @@ export default function App() {
         </header>
 
         {/* CONTAINER FOR VIEWS */}
-        <main className="max-w-7xl mx-auto px-6 py-8">
+        <main className={gameStatus === 'playing' || gameStatus === 'guessed' ? "w-screen h-screen absolute inset-0 overflow-hidden" : "max-w-7xl mx-auto px-6 py-8 mt-16"}>
           <AnimatePresence mode="wait">
             
             {/* 1. START SCREEN */}
@@ -802,6 +802,34 @@ export default function App() {
                           className="w-full py-2.5 bg-slate-800 hover:bg-blue-600 hover:text-white text-xs font-bold text-slate-300 rounded-xl transition cursor-pointer font-display"
                         >
                           Keşfetmeye Başla
+                        </button>
+                      </motion.div>
+
+                      {/* MODE: SINIRSIZ MOD */}
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-750 transition-all duration-300 rounded-2xl p-6 flex flex-col justify-between h-72 shadow-xl group cursor-pointer"
+                        onClick={() => handleStartGame('unlimited')}
+                      >
+                        <div className="space-y-4">
+                          <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shadow-inner group-hover:bg-purple-500/25 transition">
+                            <Compass className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <h4 className="font-bold text-white text-md">Sınırsız Mod</h4>
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded">Zor</span>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                              Süre yok, tur sınırı yok! Tüm dünyada rastgele konumlarda dilediğiniz kadar gezin.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleStartGame('unlimited'); }}
+                          className="w-full py-2.5 bg-slate-800 hover:bg-purple-600 hover:text-white text-xs font-bold text-slate-300 rounded-xl transition cursor-pointer font-display"
+                        >
+                          Sonsuz Keşfe Çık
                         </button>
                       </motion.div>
 
@@ -1162,7 +1190,7 @@ export default function App() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[76vh] w-full relative">
+                <div className="w-full h-full relative">
                   
                   {/* LOW TIME WARNING RED VIGNETTE OVERLAY */}
                   {gameStatus === 'playing' && timeLeft <= 10 && (
@@ -1230,7 +1258,7 @@ export default function App() {
 
                   {/* LEFT AREA: MAIN IMMERSIVE STREET VIEW PANORAMA */}
                   <div
-                    className={`h-full relative rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 lg:col-span-8 ${
+                    className={`absolute inset-0 z-10 ${
                       mobileActiveView === 'pano' ? 'block' : 'hidden lg:block'
                     }`}
                   >
@@ -1271,11 +1299,13 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* RIGHT AREA: INTEGRATED RE-SIZABLE GUESS MAP (DESKTOP: SIDE-BY-SIDE SEPARATED; MOBILE: FULL TAB VIEW) */}
+                  {/* RIGHT AREA: INTEGRATED RE-SIZABLE GUESS MAP */}
                   <div
-                    className={`transition-all duration-300 ${
-                      mobileActiveView === 'map' ? 'block' : 'hidden lg:block'
-                    } lg:col-span-4 h-full relative group rounded-2xl overflow-hidden border border-slate-805 bg-slate-950 shadow-2xl hover:scale-[1.02] hover:shadow-blue-500/10 hover:border-slate-700/80 z-20`}
+                    onMouseEnter={handleMouseEnterMap}
+                    onMouseLeave={handleMouseLeaveMap}
+                    className={`transition-all duration-300 ease-in-out bg-slate-950 ${
+                      mobileActiveView === 'map' ? 'block w-full h-full z-30' : 'hidden lg:block absolute bottom-8 right-8 z-30 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-700/60 overflow-hidden'
+                    } ${!isMapExpanded && mobileActiveView !== 'map' ? 'w-[320px] h-[320px] rounded-[48px] opacity-70 hover:opacity-100 hover:scale-[1.03] hover:rounded-3xl hover:border-slate-500' : ''} ${isMapExpanded && mobileActiveView !== 'map' ? 'w-[600px] h-[600px] rounded-3xl opacity-100' : ''}`}
                   >
                     <div className="w-full h-full relative flex flex-col justify-between">
                       

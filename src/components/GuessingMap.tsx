@@ -146,7 +146,7 @@ export default function GuessingMap({
   };
 
   return (
-    <div className="w-full h-full relative rounded-xl overflow-hidden border border-slate-700/60 shadow-xl bg-slate-900">
+    <div className="w-full h-full relative overflow-hidden bg-slate-900">
       
       {/* BASE REACT MAP */}
       <Map
