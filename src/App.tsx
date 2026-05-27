@@ -218,7 +218,7 @@ export default function App() {
     } else if (mode === 'world') {
       pool = LOCATIONS.filter((l) => l.category === 'Dünya');
     } else if (mode === 'world_streets') {
-      pool = LOCATIONS.filter((l) => l.category === 'Sokaklar');
+      pool = LOCATIONS.filter((l) => l.category === 'Sokaklar' || !['Türkiye', 'Dünya'].includes(l.category));
     } else if (mode === 'satellite') {
       pool = LOCATIONS; // Satellite mode can use any coordinates
     } else if (mode === 'asia_region') {
